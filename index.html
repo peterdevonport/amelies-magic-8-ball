@@ -135,7 +135,7 @@
       <div id="answer">8</div>
     </div>
   </div>
-  <p class="hint">Click the ball or press Enter</p>
+  <p class="hint">Shake your phone, click the ball, or press Enter</p>
   <input id="question-input" type="text" placeholder="Ask a yes/no question..." onkeydown="if(event.key==='Enter') shake()">
   <br>
   <button onclick="shake()">Ask!</button>
@@ -185,6 +185,35 @@ function shake() {
 
   input.value = '';
   input.focus();
+}
+
+// Shake detection
+let shakeThreshold = 15;
+let lastAccel = { x: 0, y: 0, z: 0 };
+let lastShakeTime = 0;
+
+if (window.DeviceMotionEvent) {
+  if (typeof DeviceMotionEvent.requestPermission === 'function') {
+    document.addEventListener('click', function init() {
+      DeviceMotionEvent.requestPermission();
+      document.removeEventListener('click', init);
+    }, { once: true });
+  }
+
+  window.addEventListener('devicemotion', function (e) {
+    const a = e.accelerationIncludingGravity;
+    if (!a.x && !a.y && !a.z) return;
+
+    const dx = Math.abs(a.x - lastAccel.x);
+    const dy = Math.abs(a.y - lastAccel.y);
+    const dz = Math.abs(a.z - lastAccel.z);
+
+    if ((dx + dy + dz) > shakeThreshold && Date.now() - lastShakeTime > 1000) {
+      lastShakeTime = Date.now();
+      shake();
+    }
+    lastAccel = { x: a.x, y: a.y, z: a.z };
+  });
 }
 </script>
 </body>
