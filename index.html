@@ -135,7 +135,7 @@
       <div id="answer">8</div>
     </div>
   </div>
-  <p class="hint">Shake your phone, click the ball, or press Enter</p>
+  <p class="hint">Type a question first, then shake your phone or click the ball</p>
   <input id="question-input" type="text" placeholder="Ask a yes/no question..." onkeydown="if(event.key==='Enter') shake()">
   <br>
   <button onclick="shake()">Ask!</button>
@@ -163,7 +163,15 @@ function shake() {
   const history = document.getElementById('history');
 
   let question = input.value.trim();
-  if (!question) question = "the universe";
+  if (!question) {
+    input.placeholder = "Ask something first!";
+    input.style.borderColor = "#ff6b6b";
+    setTimeout(() => {
+      input.placeholder = "Ask a yes/no question...";
+      input.style.borderColor = "rgba(255,255,255,0.15)";
+    }, 1500);
+    return;
+  }
 
   ball.classList.remove('shaking');
   void ball.offsetWidth;
