@@ -5,142 +5,184 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎱 Magic 8-Ball</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .container {
-    text-align: center;
-    padding: 2rem;
-  }
-  h1 {
-    color: #fff;
-    font-size: 2.5rem;
-    margin-bottom: 2rem;
-    text-shadow: 0 0 20px rgba(255,255,255,0.1);
-  }
-  .ball {
-    width: 300px;
-    height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #1a1a2e, #000);
-    margin: 0 auto 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow:
-      inset 0 -20px 40px rgba(0,0,0,0.8),
-      0 0 60px rgba(100,100,255,0.15),
-      0 20px 60px rgba(0,0,0,0.5);
-    transition: transform 0.1s;
-    user-select: none;
-    position: relative;
-  }
-  .ball:active { transform: scale(0.95); }
-  .ball::before {
-    content: '';
-    position: absolute;
-    top: 15%;
-    left: 20%;
-    width: 35%;
-    height: 25%;
-    background: radial-gradient(ellipse, rgba(255,255,255,0.12), transparent);
-    border-radius: 50%;
-  }
-  .window {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 40% 35%, #1a2a6c, #0a0a1a);
-    border: 4px solid #4a4a6a;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-    position: relative;
-    z-index: 1;
-  }
-  #answer {
-    color: #b8c6ff;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-align: center;
-    line-height: 1.3;
-    transition: opacity 0.3s;
-    text-shadow: 0 0 10px rgba(100,150,255,0.3);
-  }
-  .shaking { animation: shake 0.4s; }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-8px) rotate(-3deg); }
-    40% { transform: translateX(8px) rotate(3deg); }
-    60% { transform: translateX(-5px) rotate(-2deg); }
-    80% { transform: translateX(5px) rotate(2deg); }
-  }
-  .hint {
-    color: rgba(255,255,255,0.4);
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-  }
-  #question-input {
-    padding: 0.8rem 1.2rem;
-    border: 2px solid rgba(255,255,255,0.15);
-    border-radius: 25px;
-    background: rgba(255,255,255,0.06);
-    color: #fff;
-    font-size: 1rem;
-    width: 320px;
-    max-width: 90vw;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  #question-input:focus { border-color: rgba(100,150,255,0.4); }
-  #question-input::placeholder { color: rgba(255,255,255,0.25); }
-  button {
-    margin-top: 0.8rem;
-    padding: 0.7rem 2rem;
-    border: none;
-    border-radius: 25px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: transform 0.15s, box-shadow 0.15s;
-  }
-  button:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(102,126,234,0.4); }
-  button:active { transform: translateY(0); }
-  .history {
-    margin-top: 1.5rem;
-    color: rgba(255,255,255,0.3);
-    font-size: 0.8rem;
-    max-height: 100px;
-    overflow-y: auto;
-  }
-  .history p { margin: 0.3rem 0; }
-  .history strong { color: rgba(255,255,255,0.5); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.container {
+  text-align: center;
+  padding: 2rem;
+  width: 100%;
+}
+h1 {
+  color: #fff;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 20px rgba(255,255,255,0.1);
+}
+
+.scene {
+  perspective: 800px;
+  width: 300px;
+  height: 300px;
+  margin: 0 auto 2rem;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  position: relative;
+}
+.scene:active { cursor: grabbing; }
+
+.ball {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 -20px 40px rgba(0,0,0,0.8),
+    0 0 60px rgba(100,100,255,0.15),
+    0 20px 60px rgba(0,0,0,0.5);
+}
+
+.ball-inner {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, #1a1a2e, #000);
+}
+
+.ball-highlight {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 3;
+  width: 45%;
+  height: 38%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.14), transparent);
+}
+
+/* Shadow overlay that moves to simulate 3D lighting */
+.lighting-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.window {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #1a2a6c, #0a0a1a);
+  border: 4px solid #4a4a6a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  cursor: pointer;
+}
+
+#answer {
+  color: #b8c6ff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
+  transition: opacity 0.3s;
+  text-shadow: 0 0 10px rgba(100,150,255,0.3);
+}
+
+.shaking { animation: shakeBall 0.45s ease-in-out; }
+@keyframes shakeBall {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  15% { transform: translateX(-10px) translateY(2px); }
+  30% { transform: translateX(8px) translateY(-2px); }
+  45% { transform: translateX(-6px) translateY(1px); }
+  60% { transform: translateX(4px) translateY(-1px); }
+  75% { transform: translateX(-2px) translateY(0); }
+  90% { transform: translateX(1px) translateY(0); }
+}
+
+.hint {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+#question-input {
+  padding: 0.8rem 1.2rem;
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 25px;
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+  font-size: 1rem;
+  width: 320px;
+  max-width: 90vw;
+  outline: none;
+  transition: border-color 0.2s;
+}
+#question-input:focus { border-color: rgba(100,150,255,0.4); }
+#question-input::placeholder { color: rgba(255,255,255,0.25); }
+
+button {
+  margin-top: 0.8rem;
+  padding: 0.7rem 2rem;
+  border: none;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+button:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(102,126,234,0.4); }
+button:active { transform: translateY(0); }
+
+.history {
+  margin-top: 1.5rem;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.8rem;
+  max-height: 100px;
+  overflow-y: auto;
+}
+.history p { margin: 0.3rem 0; }
+.history strong { color: rgba(255,255,255,0.5); }
 </style>
 </head>
 <body>
 <div class="container">
   <h1>🎱 Magic 8-Ball</h1>
-  <div class="ball" id="ball" onclick="shake()">
-    <div class="window">
-      <div id="answer">8</div>
+  <div class="scene" id="scene">
+    <div class="ball" id="ball">
+      <div class="ball-inner"></div>
+      <div class="lighting-overlay" id="lightingOverlay"></div>
+      <div class="ball-highlight" id="highlight"></div>
+      <div class="window" onclick="shake()">
+        <div id="answer">8</div>
+      </div>
     </div>
   </div>
-  <p class="hint">Type a question first, then shake your phone or click the ball</p>
+  <p class="hint" id="hint">Drag to rotate · Type a question, then click the ball</p>
   <input id="question-input" type="text" placeholder="Ask a yes/no question..." onkeydown="if(event.key==='Enter') shake()">
   <br>
   <button onclick="shake()">Ask!</button>
   <div class="history" id="history"></div>
 </div>
+
 <script>
 const answers = [
   "It is certain.", "Without a doubt.", "Yes, definitely.",
@@ -155,27 +197,70 @@ const answers = [
 ];
 
 let lastAnswer = null;
+let isShaking = false;
+
+// 3D sphere rotation state
+let rotX = -15, rotY = 20;
+let isDragging = false, prevX, prevY;
+
+function applyRotation() {
+  const normX = rotX / 60;
+  const normY = (rotY % 360) / 360;
+
+  // Shift the inner gradient to simulate the sphere rotating
+  const gx = 50 - normY * 30;
+  const gy = 50 + normX * 25;
+  const inner = document.querySelector('.ball-inner');
+  inner.style.background = `radial-gradient(circle at ${gx}% ${gy}%, #2a2a44, #0a0a14 60%, #000)`;
+
+  // Lighting overlay darkens the side opposite the light
+  const lx = 50 - normY * 35;
+  const ly = 50 + normX * 30;
+  const overlay = document.getElementById('lightingOverlay');
+  overlay.style.background = `radial-gradient(circle at ${lx}% ${ly}%, transparent 25%, rgba(0,0,0,0.5) 75%, rgba(0,0,0,0.7))`;
+
+  // Highlight follows the light source (upper-left)
+  const highlight = document.getElementById('highlight');
+  const hlX = 12 + (1 - normY) * 22;
+  const hlY = 4 + (1 - normX) * 20;
+  highlight.style.left = Math.max(4, Math.min(50, hlX)) + '%';
+  highlight.style.top = Math.max(1, Math.min(32, hlY)) + '%';
+  highlight.style.opacity = Math.max(0.05, 0.14 - (Math.abs(normX) + Math.abs(normY * 0.5)) * 0.1);
+}
 
 function shake() {
+  if (isShaking) return;
+
   const ball = document.getElementById('ball');
   const answerEl = document.getElementById('answer');
   const input = document.getElementById('question-input');
   const history = document.getElementById('history');
+  const hint = document.getElementById('hint');
 
   let question = input.value.trim();
   if (!question) {
     input.placeholder = "Ask something first!";
     input.style.borderColor = "#ff6b6b";
+    hint.textContent = "✋ Ask something!";
+    hint.style.color = "rgba(255,150,150,0.5)";
     setTimeout(() => {
       input.placeholder = "Ask a yes/no question...";
       input.style.borderColor = "rgba(255,255,255,0.15)";
+      hint.textContent = "Drag to rotate · Type a question, then click the ball";
+      hint.style.color = "";
     }, 1500);
     return;
   }
 
+  isShaking = true;
+  hint.textContent = "🔮 Thinking...";
+  hint.style.color = "rgba(180,200,255,0.5)";
+
   ball.classList.remove('shaking');
   void ball.offsetWidth;
   ball.classList.add('shaking');
+
+  answerEl.style.opacity = '0';
 
   let answer;
   do {
@@ -185,15 +270,50 @@ function shake() {
 
   setTimeout(() => {
     answerEl.textContent = answer;
+    answerEl.style.opacity = '1';
+    hint.textContent = "Drag to rotate · Type a question, then click the ball";
+    hint.style.color = "";
+
     const entry = document.createElement('p');
     entry.innerHTML = `<strong>Q:</strong> ${question} &rarr; ${answer}`;
     history.prepend(entry);
     while (history.children.length > 10) history.removeChild(history.lastChild);
-  }, 400);
+
+    isShaking = false;
+  }, 500);
 
   input.value = '';
   input.focus();
 }
+
+// 3D sphere drag
+const scene = document.getElementById('scene');
+
+scene.onpointerdown = function (e) {
+  if (e.target.closest('.window')) return;
+  isDragging = true;
+  prevX = e.clientX;
+  prevY = e.clientY;
+  scene.setPointerCapture(e.pointerId);
+};
+
+scene.onpointermove = function (e) {
+  if (!isDragging) return;
+  const dx = e.clientX - prevX;
+  const dy = e.clientY - prevY;
+  rotY += dx * 0.5;
+  rotX += dy * 0.5;
+  rotX = Math.max(-60, Math.min(60, rotX));
+  prevX = e.clientX;
+  prevY = e.clientY;
+  applyRotation();
+};
+
+scene.onpointerup = scene.onpointercancel = function () {
+  isDragging = false;
+};
+
+applyRotation();
 
 // Shake detection
 let shakeThreshold = 15;
